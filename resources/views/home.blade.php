@@ -49,6 +49,7 @@
 @endsection
 
 @section('scripts')
+    {{--
     <script>
         $(document).ready(function() {
             let selectedYear, selectedMonth;
@@ -140,4 +141,5 @@
             }
         });
     </script>
+    --}}
 @endsection

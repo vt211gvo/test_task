@@ -17,7 +17,6 @@ use App\Http\Controllers\CarRentController;
 // });
 
 Route::get('/', [CarRentController::class, 'index']);
-Route::get('/get-bookings', [CarRentController::class, 'getBookings']);
 
 // Fallback Route
 Route::fallback(function(){
