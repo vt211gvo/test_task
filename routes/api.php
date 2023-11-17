@@ -19,4 +19,3 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 
-Route::get('/get-bookings', [CarRentController::class, 'getBookings']);
