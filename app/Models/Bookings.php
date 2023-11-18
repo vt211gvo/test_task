@@ -50,7 +50,17 @@ class Bookings extends Model
 
         $summary = $grouped->map(function ($items, $key) {
             $item = $items->first();
-            $item->occupied = $items->sum('occupied');
+
+            $allOccupiedDays = [];
+
+            foreach ($items as $booking) {
+                $occupiedDays = $booking->occupied;
+                $allOccupiedDays = array_merge($allOccupiedDays, $occupiedDays);
+            }
+
+            $uniqueOccupiedDays = array_unique($allOccupiedDays);
+            $item->occupied = count($uniqueOccupiedDays);
+
             return $item;
         });
 
@@ -63,7 +73,8 @@ class Bookings extends Model
         return $summary;
     }
 
-    public static function calculateOccupiedDays($booking, $year, $month): int
+
+    public static function calculateOccupiedDays($booking, $year, $month): array
     {
 //        Авто вважається вільним, якщо воно було не зайняте 9 і більше годин підряд з 9 ранку до 9 вечора.
 
@@ -75,9 +86,6 @@ class Bookings extends Model
         $firstDayOfMonth->setTime(9, 0);
         $lastDayOfMonth = new DateTime("{$year}-{$month}-" . cal_days_in_month(CAL_GREGORIAN, $month, $year));
         $lastDayOfMonth->setTime(21, 0);
-        if($startDateTime < $firstDayOfMonth && $endDateTime > $lastDayOfMonth){
-            return cal_days_in_month(CAL_GREGORIAN, $month, $year);
-        }
 
         if ($startDateTime < $firstDayOfMonth) {
             $startDateTime = $firstDayOfMonth;
@@ -86,8 +94,7 @@ class Bookings extends Model
             $endDateTime = $lastDayOfMonth;
         }
 
-        $occupiedDays = 0;
-
+        $occupiedDays = array();
 
         while ($startDateTime <= $endDateTime) {
             $hoursArray = array();
@@ -110,7 +117,7 @@ class Bookings extends Model
                 return $hour >= 9 && $hour <= 21;
             });
 
-            if(count($filteredHours)>3) $occupiedDays++;
+            if(count($filteredHours)>3) $occupiedDays[] = $startDateTime->format('j'); ;
 
             $startDateTime->modify('+1 day');
             $startDateTime->setTime(0, 0);
